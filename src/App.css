@@ -10,22 +10,40 @@
   height: 100vh;
 }
 
+.form-background {
+  background-image: url(/Users/karinalage/star-wars-vehicles/src/images/form-background.jpg);
+  background-size: cover;
+  background-repeat: no-repeat;
+  height: 100vh;
+
+}
+
 .center-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 25vh;
+  min-height: 18vh;
 }
 
-.App-logo {
+.logo {
   height: 20vmin;
 }
 
-.App-header {
+.header {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
+
+.homepage-subtitle p {
+  align-items: center; 
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+  color: #4F3429;
+  
+}
+
+
