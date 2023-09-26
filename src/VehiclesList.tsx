@@ -49,9 +49,7 @@ const vehicleImageMapping: { [key: string]: string } = {
   'Clone turbo tank': '/images/vehicles/Clone-turbo-tank.png',
   'Corporate Alliance tank droid': '/images/vehicles/Corporate-Alliance-tank-droid.png',
   'Droid gunship': '/images/vehicles/Droid-gunship.png',
-  'AT-RT': '/images/vehicles/AT-RT.png',
-  
-  // Add more entries for other vehicle names and their corresponding image file names
+  'AT-RT': '/images/vehicles/AT-RT.png'
 };
 
 
@@ -68,7 +66,7 @@ const VehiclesList: React.FC = () => {
         let page = 1;
 
         while (true) {
-          const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+          const proxyUrl = 'https://proxy.cors.sh/';
           const apiUrl = `https://swapi.dev/api/vehicles/?page=${page}`;
           const response = await axios.get(proxyUrl + apiUrl);
           const apiData: { results: Item[]; next: string } = response.data;
