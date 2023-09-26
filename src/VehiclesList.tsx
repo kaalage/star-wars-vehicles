@@ -54,38 +54,51 @@ const vehicleImageMapping: { [key: string]: string } = {
   // Add more entries for other vehicle names and their corresponding image file names
 };
 
+
 const VehiclesList: React.FC = () => {
   const [data, setData] = useState<Item[]>([]);
   const [selectedItem, setSelectedItem] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemsPerPage = 8; // Number of items to display per page
 
   useEffect(() => {
     const fetchData = async () => {
-      let allData: Item[] = [];
+      try {
+        let allData: Item[] = [];
+        let page = 1;
 
-      // Initial request
-      let response = await axios.get('https://swapi.dev/api/vehicles/');
-      let apiData: { results: Item[]; next: string } = response.data;
-      allData = allData.concat(apiData.results);
+        while (true) {
+          const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+          const apiUrl = `https://swapi.dev/api/vehicles/?page=${page}`;
+          const response = await axios.get(proxyUrl + apiUrl);
+          const apiData: { results: Item[]; next: string } = response.data;
+          allData = allData.concat(apiData.results);
 
-      // Loop through additional pages
-      while (apiData.next) {
-        response = await axios.get(apiData.next);
-        apiData = response.data;
-        allData = allData.concat(apiData.results);
+          if (!apiData.next) {
+            break;
+          }
+
+          page++;
+        }
+
+        setData(allData);
+      } catch (error) {
+        console.error(error);
       }
-
-      setData(allData);
     };
 
-    fetchData().catch(err => console.log(err));
+    fetchData();
   }, []);
 
   const handleItemClick = (name: string) => {
     setSelectedItem(name);
   };
 
-  console.log(vehicleImageMapping);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
 
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   return (
     <div className="background-image">
@@ -94,7 +107,7 @@ const VehiclesList: React.FC = () => {
         <div className="center-container">
           {/* Render the image list */}
           <ImageList cols={4} gap={10} sx={{ width: 1050 }} rowHeight={250}>
-            {data.map((item) => (
+            {currentItems.map((item) => (
               <ImageListItem
                 sx={{ width: 250 }}
                 key={item.id}
@@ -109,6 +122,12 @@ const VehiclesList: React.FC = () => {
             ))}
           </ImageList>
           <Box textAlign='center' sx={{ '& button': { m: 1 } }}>
+            {/* Pagination */}
+            {Array.from({ length: Math.ceil(data.length / itemsPerPage) }).map((_, index) => (
+              <button key={index} onClick={() => paginate(index + 1)}>
+                {index + 1}
+              </button>
+            ))}
           </Box>
         </div>
       </header>
