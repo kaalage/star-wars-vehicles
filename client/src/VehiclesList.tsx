@@ -4,6 +4,7 @@ import axios from 'axios';
 import logo2 from './images/logo.png';
 import { Box } from '@mui/material';
 import { ImageList, ImageListItem } from '@mui/material';
+import { Link } from 'react-router-dom'; // Import Link
 
 interface Item {
   id: number;
@@ -51,6 +52,7 @@ const VehiclesList: React.FC = () => {
           {/* Render the image list */}
           <ImageList cols={4} gap={0} sx={{ width: 1000, height: 500 }} rowHeight={100}>
             {currentItems.map((item) => (
+              <Link to={`/checkout`}>
               <ImageListItem
                 sx={{ width: 250 }}
                 key={item.id}
@@ -66,6 +68,7 @@ const VehiclesList: React.FC = () => {
                 <div className="image-title">{item.name}</div>
               </div>
               </ImageListItem>
+              </Link>
             ))}
           </ImageList>
           <Box textAlign='center' sx={{ '& button': { m: 1 } }}>
