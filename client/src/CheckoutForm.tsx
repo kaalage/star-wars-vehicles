@@ -1,14 +1,12 @@
 import { FormEvent, useState } from "react";
-import { AccountForm } from "./AccountForm";
+import { PaymentForm } from "./PaymentForm";
 import { AddressForm } from "./AddressForm";
 import { useMultistepForm } from "./useMultistepForm";
 import { UserForm } from "./UserForm";
 import { Button } from '@mui/material';
-import { relative } from "path";
 
 type FormData = {
   firstName: string;
-  lastName: string;
   age: string;
   street: string;
   city: string;
@@ -16,11 +14,14 @@ type FormData = {
   zip: string;
   email: string;
   password: string;
+  nameOnCard: string;
+  cardNumber: string;
+  expiration: string;
+  cvc: string;
 };
 
 const INITIAL_DATA: FormData = {
   firstName: "",
-  lastName: "",
   age: "",
   street: "",
   city: "",
@@ -28,6 +29,10 @@ const INITIAL_DATA: FormData = {
   zip: "",
   email: "",
   password: "",
+  nameOnCard:"",
+  cardNumber:"",
+  expiration: "",
+  cvc:"",
 };
 
 function CheckoutForm() {
@@ -50,13 +55,13 @@ function CheckoutForm() {
   } = useMultistepForm([
     <UserForm {...data} updateFields={updateFields} />,
     <AddressForm {...data} updateFields={updateFields} />,
-    <AccountForm {...data} updateFields={updateFields} />,
+    <PaymentForm {...data} updateFields={updateFields} />,
   ]);
 
   function onSubmit(e: FormEvent) {
     e.preventDefault();
     if (!isLastStep) return next();
-    alert("Successful Account Creation");
+    alert("Your order will arive in 10 days. May the force be with you!");
   }
 
   return (
@@ -78,7 +83,8 @@ function CheckoutForm() {
           <div style={{ 
             position: "absolute", 
             top: ".8rem", 
-            right: ".8rem" }}>
+            right: ".8rem",
+            }}>
             {currentStepIndex + 1} / {steps.length}
           </div>
           {step}

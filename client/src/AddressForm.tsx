@@ -19,7 +19,7 @@ export function AddressForm({
   updateFields,
 }: AddressFormProps) {
   return (
-    <FormWrapper title="Address">
+    <FormWrapper title="Shipping details" inputStyle={{ height: "2rem", fontSize:'1rem' }}>
       <label>Street</label>
       <input
         autoFocus
