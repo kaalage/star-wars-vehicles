@@ -1,115 +1,118 @@
-import React from 'react';
-import axios from 'axios';
-import { Formik, Form, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
-import { TextField, Paper, Button, Box} from '@mui/material';
-import { Link } from 'react-router-dom';
+import { FormEvent, useState } from "react";
+import { PaymentForm } from "./PaymentForm";
+import { AddressForm } from "./AddressForm";
+import { useMultistepForm } from "./useMultistepForm";
+import { UserForm } from "./UserForm";
+import { Button } from '@mui/material';
 
+type FormData = {
+  firstName: string;
+  age: string;
+  street: string;
+  city: string;
+  state: string;
+  zip: string;
+  email: string;
+  password: string;
+  nameOnCard: string;
+  cardNumber: string;
+  expiration: string;
+  cvc: string;
+};
 
-const CheckoutForm: React.FC = () => {
-  const initialValues = {
-    name: '',
-    email: '',
-    phone: '',
-    cpfCnpj: '',
-    cep: ''
-  };
+const INITIAL_DATA: FormData = {
+  firstName: "",
+  age: "",
+  street: "",
+  city: "",
+  state: "",
+  zip: "",
+  email: "",
+  password: "",
+  nameOnCard:"",
+  cardNumber:"",
+  expiration: "",
+  cvc:"",
+};
 
-  const validationSchema = Yup.object().shape({
-    name: Yup.string().required('Nome é obrigatório'),
-    email: Yup.string().email('E-mail inválido').required('E-mail é obrigatório'),
-    phone: Yup.string().required('Telefone é obrigatório'),
-    cpfCnpj: Yup.string().required('CPF/CNPJ é obrigatório'),
-    cep: Yup.string().required('CEP é obrigatório'),
-  });
+function CheckoutForm() {
+  const [data, setData] = useState(INITIAL_DATA);
 
-  const handleSubmit = (values: any) => {
-    // Perform form submission logic
-    console.log(values);
-  };
+  function updateFields(fields: Partial<FormData>) {
+    setData((prev) => {
+      return { ...prev, ...fields };
+    });
+  }
+  
+  const {
+    steps,
+    currentStepIndex,
+    step,
+    isFirstStep,
+    isLastStep,
+    back,
+    next,
+  } = useMultistepForm([
+    <UserForm {...data} updateFields={updateFields} />,
+    <AddressForm {...data} updateFields={updateFields} />,
+    <PaymentForm {...data} updateFields={updateFields} />,
+  ]);
+
+  function onSubmit(e: FormEvent) {
+    e.preventDefault();
+    if (!isLastStep) return next();
+    alert("Your order will arive in 10 days. May the force be with you!");
+  }
 
   return (
-    <div className="form-background">
-      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-      <Paper  elevation={3} sx={{ width: 600, height: 710, padding: '1rem' }}>
-      <h2>Checkout</h2><br></br>
-      <p>Informações pessoais</p>
-      <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
-        <Form>
-          <div>
-            <TextField id="outlined-basic" label="Nome completo" variant="outlined" type="text" style={{ marginBottom: '10px', marginTop: '20px'}} fullWidth/>
-            <ErrorMessage name="name" component="div" />
+    <div className="form-background" 
+    style={{ 
+      display: "flex", 
+      justifyContent: "center", 
+      alignItems: "center", 
+      height: "100vh", 
+      position: 'relative'}}>
+      <div
+        style={{
+          background: "rgba(255, 255, 255, 0.7)", 
+          padding: "2rem", 
+          borderRadius: ".5rem", 
+          maxWidth: "max-content", 
+          position: 'relative'}}>
+        <form onSubmit={onSubmit}>
+          <div style={{ 
+            position: "absolute", 
+            top: ".8rem", 
+            right: ".8rem",
+            }}>
+            {currentStepIndex + 1} / {steps.length}
           </div>
-          <div>
-            <TextField id="outlined-basic" label="E-mail" variant="outlined" type="email" style={{ marginBottom: '10px'}} fullWidth/>
-            <ErrorMessage name="email" component="div" />
+          {step}
+          <div
+            style={{
+              marginTop: "1rem", 
+              display: "flex", 
+              gap: ".5rem",
+              justifyContent: "flex-end",}}>
+            {!isFirstStep && (
+              <Button 
+              type="button" onClick={back}
+              variant="contained" 
+              size="medium" 
+              color="primary"
+              sx={{backgroundColor: '#000000', '&:hover': {backgroundColor: '#666'},}}>Back</Button>
+            )}
+            <Button 
+              type="submit"
+              variant="contained" 
+              size="medium" 
+              color="primary"
+              sx={{backgroundColor: '#000000', '&:hover': {backgroundColor: '#666'},}}>{isLastStep ? "Finish" : "Next"}</Button>
           </div>
-          <div>
-            <TextField id="outlined-basic" label="Telefone" variant="outlined" type="number" style={{ marginBottom: '10px'}} fullWidth/>
-            <ErrorMessage name="phone" component="div" />
-          </div>
-          <div>
-            <TextField id="outlined-basic" label="CPF/CNPJ" variant="outlined" type="number" style={{ marginBottom: '10px'}} fullWidth/>
-            <ErrorMessage name="cpfCnpj" component="div" />
-          </div><br></br>
-
-          <p>Informações de Endereço</p><br></br>
-          <div>
-            <TextField id="outlined-basic" label="CEP" variant="outlined" type="number" style={{ marginBottom: '10px'}} fullWidth/>
-            <ErrorMessage name="cep" component="div" />
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '0.5rem', marginBottom:'10px' }}>
-          <div>
-            <TextField id="outlined-basic" label="Endereço" variant="outlined" type="text" fullWidth/>
-            <ErrorMessage name="address" component="div" />
-          </div>
-          <div>
-            <TextField id="outlined-basic" label="Número" variant="outlined" type="number" fullWidth/>
-            <ErrorMessage name="number" component="div" />
-          </div>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '0.5rem', marginBottom:'10px' }} >
-          <div>
-            <TextField id="outlined-basic" label="Complemento" variant="outlined" type="text" fullWidth/>
-            <ErrorMessage name="additional" component="div" />
-          </div>
-          <div>
-            <TextField id="outlined-basic" label="Cidade" variant="outlined" type="text" fullWidth/>
-            <ErrorMessage name="city" component="div" />
-          </div>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '0.5rem', marginBottom:'10px' }}>
-          <div>
-            <TextField id="outlined-basic" label="Bairro" variant="outlined" type="text" fullWidth/>
-            <ErrorMessage name="neighborhood" component="div" />
-          </div>
-          <div>
-          <TextField id="outlined-basic" label="UF" variant="outlined" type="text" fullWidth/>
-            <ErrorMessage name="state" component="div" />
-          </div>
-          </div>
-          
-          <Box textAlign='center' sx={{ '& button': { m: 1 } }}>
-            <div>
-              <Link to="/checkout">
-                <Button 
-                  variant="contained" 
-                    size="small" 
-                    color="primary"
-                    sx={{
-                    backgroundColor: '#000000', '&:hover': {backgroundColor: '#666'},
-              }}>Submit</Button>
-              </Link>
-            </div>
-          </Box>
-        </Form>
-      </Formik>
-      </Paper>
-      </Box>
-    </div>    
+        </form>
+      </div>
+    </div>
   );
-};
+}
 
 export default CheckoutForm;
